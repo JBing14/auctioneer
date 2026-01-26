@@ -22,14 +22,25 @@ function saveDraftState() {
         draftedPlayers: draftedPlayers,
         timestamp: new Date().getTime()
     };
-    localStorage.setItem('fantasyDraftState', JSON.stringify(draftState));
+    try {
+        localStorage.setItem('fantasyDraftState', JSON.stringify(draftState));
+        console.log('Draft state saved:', draftState);
+    } catch (e) {
+        console.error('Error saving draft state:', e);
+        alert('Unable to save draft state. localStorage may not be available.');
+    }
 }
 
 // Load draft state from localStorage
 function loadDraftState() {
-    var savedState = localStorage.getItem('fantasyDraftState');
-    if (savedState) {
-        return JSON.parse(savedState);
+    try {
+        var savedState = localStorage.getItem('fantasyDraftState');
+        console.log('Loaded from localStorage:', savedState);
+        if (savedState) {
+            return JSON.parse(savedState);
+        }
+    } catch (e) {
+        console.error('Error loading draft state:', e);
     }
     return null;
 }
@@ -71,15 +82,20 @@ function restoreDraft(state) {
 
 // Check for saved draft on page load
 window.addEventListener('load', function() {
+    console.log('Page loaded, checking for saved draft...');
     var savedState = loadDraftState();
+    console.log('Saved state found:', savedState);
     if (savedState) {
         // Show prompt to resume
         var resume = confirm("A previous draft was found. Do you want to resume where you left off?\n\nClick OK to resume or Cancel to start fresh.");
+        console.log('User chose to resume:', resume);
         if (resume) {
             restoreDraft(savedState);
         } else {
             clearDraftState();
         }
+    } else {
+        console.log('No saved state found');
     }
 });
 
